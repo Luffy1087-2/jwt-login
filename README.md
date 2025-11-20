@@ -12,9 +12,9 @@ Open the terminal and type `node`, then type the following command:
 require('crypto').randomBytes(64).toString('hex')
 ```
 This will generate a string similar to `756fab306138c484a6feb69ad47d764f3ae078db3dc7c8df6eceb930a29c319db87b3c887682eff770022bbc734e2231afdd715ecd6e4257e100ca8
-2cdf926a9'`
+2cdf926a9`
 
-You should repeat the same thing for creating the env varibles **JWT_ACCESS_TOKEN** and **JTW_REFRESH_TOKEN**
+You should repeat the same thing for creating the env varible **JTW_REFRESH_TOKEN**
 
 Once you did that, create a `.env` file with the already created tokens:
 ```text
