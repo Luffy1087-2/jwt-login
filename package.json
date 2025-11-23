@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "compile": "tsc"
+    "compile:watch": "tsc -w",
+    "start": "node ./dist/server.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "mongodb": "^7.0.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/typescript": "^0.4.29",
