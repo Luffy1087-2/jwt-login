@@ -1,4 +1,4 @@
-# jwt-login
+# jwt-user-tasks
 ### Requirements
 - docker >= 4.52.0
 - nodejs >= v22.19.0
