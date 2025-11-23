@@ -16,7 +16,7 @@ router.post('/login', AlreadyAuthenticated, async (req, res) => {
   const users = db.getCollection(MongoUsersCollection);
   const user = await users.findOne({ userName });
   if (!user || !bcrypt.compareSync(pw, user.pw)) return res.status(403).json({message:'login failed'});
-  const token = jwt.sign({userName}, process.env.JWT_ACCESS_TOKEN??'');
+  const token = jwt.sign({userName}, process.env.JWT_ACCESS_TOKEN??'', {expiresIn: '1h'});
   res.status(201).json({token});
 });
 
