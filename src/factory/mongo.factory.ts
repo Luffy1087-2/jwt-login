@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { MongoConnectionString } from "../consts.mongo.js";
+import { MongoConnectionString } from "../config/mongo.cfg.js";
 import { MongoClient } from 'mongodb';
 
 dotenv.config();

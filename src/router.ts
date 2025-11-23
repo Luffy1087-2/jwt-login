@@ -3,7 +3,7 @@ import {Router} from 'express';
 import { MongoFactory } from './factory/mongo.factory.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { MongoUsersCollection } from './consts.mongo.js';
+import { MongoUsersCollection } from './config/mongo.cfg.js';
 
 dotenv.config();
 const router = Router();
