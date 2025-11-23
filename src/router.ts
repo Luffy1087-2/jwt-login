@@ -1,16 +1,13 @@
 import dotenv from 'dotenv';
 import {Router} from 'express';
-import {MongoClient} from 'mongodb';
-import { MongoConnectionString, MongoUsersCollection } from './consts.mongo.js';
+import { MongoFactory } from './factory/mongo.factory.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { MongoUsersCollection } from './consts.mongo.js';
 
 dotenv.config();
-if (!process.env.JWT_ACCESS_TOKEN || !process.env.JWT_REFRESH_TOKEN) throw new TypeError('JWT_ACCESS_TOKEN/JWT_REFRESH_TOKEN must be defined');
 const router = Router();
-const client = new MongoClient(MongoConnectionString);
-await client.connect();
-const db = client.db();
+const db = new MongoFactory();
 
 router.post('/login', (req, res) => {
 
@@ -21,7 +18,7 @@ router.post('/register', async (req, res) => {
     const { userName, pw } = req.body;
     if (!userName) return res.status(400).json({ message: 'userName is not set'});
     if (!pw) return res.status(400).json({message:'password is not set'});
-    const users = db.collection(MongoUsersCollection);
+    const users = db.getCollection(MongoUsersCollection);
     const user = await users.findOne({ userName });
     if (user) return res.status(403).json({message:'user already present'});
     const hashedPw = await bcrypt.hash(pw, 10);
