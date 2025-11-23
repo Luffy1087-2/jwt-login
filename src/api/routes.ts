@@ -1,23 +1,28 @@
 import dotenv from 'dotenv';
 import {Router} from 'express';
-import { MongoFactory } from './factory/mongo.factory.js';
+import { MongoFactory } from '../factory/mongo.factory.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { MongoUsersCollection } from './config/mongo.cfg.js';
+import { MongoUsersCollection } from '../config/mongo.config.js';
+import { AssertBodyParameters } from '../middleware/assert-params.middleware.js';
+import { AlreadyAuthenticated } from '../middleware/already-authenticated.middleware.js';
 
 dotenv.config();
 const router = Router();
 const db = new MongoFactory();
 
-router.post('/login', (req, res) => {
-
+router.post('/login', AlreadyAuthenticated, async (req, res) => {
+  const {userName, pw } = req.body;
+  const users = db.getCollection(MongoUsersCollection);
+  const user = await users.findOne({ userName });
+  if (!user || !bcrypt.compareSync(pw, user.pw)) return res.status(403).json({message:'login failed'});
+  const token = jwt.sign({userName}, process.env.JWT_ACCESS_TOKEN??'');
+  res.status(201).json({token});
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', AssertBodyParameters, async (req, res) => {
   try {
     const { userName, pw } = req.body;
-    if (!userName) return res.status(400).json({ message: 'userName is not set'});
-    if (!pw) return res.status(400).json({message:'password is not set'});
     const users = db.getCollection(MongoUsersCollection);
     const user = await users.findOne({ userName });
     if (user) return res.status(403).json({message:'user already present'});
