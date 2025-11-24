@@ -4,8 +4,8 @@ import { MongoClient } from 'mongodb';
 
 dotenv.config();
 export class MongoFactory {
-  private readonly client:MongoClient;
-  
+  private readonly client: MongoClient;
+
   constructor() {
     this.AssertEnvVars();
     this.client = new MongoClient(MongoConnectionString);
