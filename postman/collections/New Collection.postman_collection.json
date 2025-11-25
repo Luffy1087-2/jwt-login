@@ -1,0 +1,255 @@
+{
+  "info": {
+    "_postman_id": "c14a5406-5ffc-4bd6-99e2-8bf15ee2fff9",
+    "name": "jwt-user-tasks",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "register",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "9ed7c910-5690-405e-8e37-6308d01cbb25",
+            "exec": [
+              "pm.environment.set(\"token\", pm.response.json().token);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "99ed2d4b-649f-4b15-bc48-e536e0af923d",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "5ab8d69b-70ae-40a6-bc80-ec55b6ff5eeb",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImFkbWluIiwiaWF0IjoxNzYzOTM4MjQxLCJleHAiOjE3NjM5NDE4NDF9.99T6aszId0PfbZCMVGKp2AL3s0ZoV33JQ-VMlcBEBQg",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userName\": \"test\",\r\n    \"pw\": \"testpw\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "9ea1e2f2-cf86-4e3e-a2b2-2233a723283e",
+            "exec": [
+              "if (pm.response.json().token) {\r",
+              "    pm.environment.set(\"token\", pm.response.json().token);\r",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "347cbfb5-d451-486f-a5a9-eddc3da84ec4",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "fe418182-dbb3-4be5-b4b3-473ae22378d2",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userName\": \"test\",\r\n    \"pw\": \"testpw\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "createTask",
+      "id": "4d59ef7a-ff29-4bfa-a4a5-966878e55006",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text",
+            "uuid": "5b170d24-07fa-4c60-94e2-d526086c2829"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"something\",\r\n    \"description\": \"something new\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/createTask",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "createTask"
+          ]
+        }
+      }
+    },
+    {
+      "name": "changeTask",
+      "id": "314c14a3-761d-48ab-ae52-32b21b9b2dc8",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text",
+            "uuid": "008952af-a0f2-44b7-b904-f3fa8061bd9c"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"taskId\": \"6924fe55d7e1c1f102a0c434\",\r\n    \"name\": \"something\",\r\n    \"description\": \"something new\",\r\n    \"status\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/changeTask",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "changeTask"
+          ]
+        }
+      }
+    },
+    {
+      "name": "deleteTask",
+      "id": "f4c597e8-4e1f-4c7a-93af-331ea42bafbc",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text",
+            "uuid": "04ae700c-ccde-42bb-b1ee-d0f4fefd1240"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n   \"taskId\": \"6924dc35ffe37f3da582d8c6\" \r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/deleteTask",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "deleteTask"
+          ]
+        }
+      }
+    },
+    {
+      "name": "getTasks",
+      "id": "01e1d3e7-3047-4820-b7d3-43abe8d1df93",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text",
+            "uuid": "32a38907-791d-494c-a796-a2bd7facf56d"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/getTasks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "getTasks"
+          ]
+        }
+      }
+    }
+  ]
+}
