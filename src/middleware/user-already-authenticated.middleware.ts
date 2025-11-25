@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import type { Response, Request, NextFunction } from 'express';
 
-dotenv.config();
 const login = (req: Request, res: Response, next: NextFunction) => {
   const { userName, pw } = req.body;
   if (!userName) return res.status(400).json({ message: 'userName is not set' });

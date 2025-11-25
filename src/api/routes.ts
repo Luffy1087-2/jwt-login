@@ -9,7 +9,6 @@ import { UserAlreadyAuthenticated } from '../middleware/user-already-authenticat
 import { VerifyAuthentication } from '../middleware/verify-authentication.middleware.js';
 import { ObjectId } from 'mongodb';
 
-dotenv.config();
 const router = Router();
 const db = new MongoService();
 

@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import type { Response, Request, NextFunction } from 'express';
 
-dotenv.config();
 export function VerifyAuthentication(req: Request, res: Response, next: NextFunction) {
   try {
     const token = req.headers['authorization']?.split(' ')[1];
