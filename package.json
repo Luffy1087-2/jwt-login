@@ -1,7 +1,7 @@
 {
   "name": "jwt-user-tasks",
   "version": "1.0.0",
-  "description": "Example of the JWT token run in the docker environment",
+  "description": "user tasks api using jwt for authentication",
   "main": "index.js",
   "type": "module",
   "scripts": {
