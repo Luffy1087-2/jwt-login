@@ -2,12 +2,14 @@ import db from '../service/mongo.service.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Router } from 'express';
-import { MongoTasksCollection, MongoUsersCollection } from '../config/mongo.config.js';
+import { MongoTasksCollection, MongoUsersCollection, MongoValidTokenCollection } from '../config/mongo.config.js';
 import { AssertBodyParameters } from '../middleware/assert-params.middleware.js';
 import { UserAlreadyAuthenticated } from '../middleware/user-already-authenticated.middleware.js';
 import { VerifyAuthentication } from '../middleware/verify-authentication.middleware.js';
 import { ObjectId } from 'mongodb';
 import { EnvVars } from '../core/env-vars.core.js';
+import { addRefreshToken } from '../service/jwt.service.js';
+import { IsRefreshTokenInWhiteList } from '../middleware/refresh-token-in-whitelist.middleware.js';
 
 const router = Router();
 router.post('/login', UserAlreadyAuthenticated, async (req, res) => {
@@ -18,13 +20,14 @@ router.post('/login', UserAlreadyAuthenticated, async (req, res) => {
     if (!user || !bcrypt.compareSync(pw, user.pw)) return res.status(403).json({ message: 'login failed' });
     const token = jwt.sign({ userName, sub: user._id }, EnvVars.jwtAccessToken, { expiresIn: '1m' });
     const refreshToken = jwt.sign({ userName, sub: user._id }, EnvVars.jwtRefreshToken, { expiresIn: '1w' });
+    await addRefreshToken(refreshToken);
     res.status(201).json({ token, refreshToken });
   } catch (e: any) {
     res.status(500).json({ message: e.message })
   }
 });
 
-router.post('/refreshToken', async (req, res) => {
+router.post('/refreshToken', IsRefreshTokenInWhiteList, async (req, res) => {
   try {
     const auth = req.headers['authorization'];
     const refreshToken = auth?.startsWith('Bearer ') && auth.split(' ')[1];
@@ -50,6 +53,7 @@ router.post('/register', AssertBodyParameters, async (req, res) => {
     if (!addedUser.acknowledged) return res.status(403).json({ message: 'error while inserting document' });
     const token = jwt.sign({ userName, sub: addedUser.insertedId }, EnvVars.jwtAccessToken, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ userName, sub: addedUser.insertedId }, EnvVars.jwtRefreshToken, { expiresIn: '1w' });
+    await addRefreshToken(refreshToken);
     res.status(201).json({ token, refrehToken: refreshToken });
   } catch (e: any) {
     res.status(500).json({ message: e.message });
@@ -96,7 +100,7 @@ router.delete('/deleteTask', VerifyAuthentication, async (req, res) => {
   }
 });
 
-router.put('/changeTask', VerifyAuthentication, async (req, res) => {
+router.put('/updateTask', VerifyAuthentication, async (req, res) => {
   try {
     const { taskId, name, description, status } = req.body;
     if (!taskId) return res.status(400).json({ message: 'taskId cannot be null' });
@@ -114,6 +118,16 @@ router.put('/changeTask', VerifyAuthentication, async (req, res) => {
   } catch (e: any) {
     res.status(500).json({ message: e.message });
   }
+});
+
+router.delete('/logout', IsRefreshTokenInWhiteList, async (req, res) => {
+  const auth = req.headers['authorization'];
+  const refreshToken = auth?.startsWith('Bearer ') && auth.split(' ')[1] || '';
+  const validTokens = db.getCollection(MongoValidTokenCollection);
+  const foundToken = await validTokens.findOne({ refreshToken });
+  if (!foundToken) return res.status(404).json({ message: 'token not found' });
+  await validTokens.deleteOne({ _id: foundToken._id });
+  res.status(200).json({ messege: 'logout success' });
 });
 
 export default router;

@@ -156,7 +156,7 @@
       }
     },
     {
-      "name": "changeTask",
+      "name": "updateTask",
       "id": "b71cb8bc-9d11-4341-952e-7902126fed3f",
       "request": {
         "method": "PUT",
@@ -169,7 +169,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{ \r\n    \"taskId\": \"69250037c300b029043a1a86\",\r\n    \"description\": \"diesel full\",\r\n    \"status\": 0\r\n}",
+          "raw": "{\r\n   \"taskId\":\"6927643f30499a3bb800d09c\",\r\n   \"status\": 0,\r\n   \"name\": \"my task\",\r\n   \"description\": \"my description\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -177,14 +177,14 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3000/changeTask",
+          "raw": "http://localhost:3000/updateTask",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "3000",
           "path": [
-            "changeTask"
+            "updateTask"
           ]
         }
       }
@@ -280,14 +280,62 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
-            "type": "text",
-            "disabled": true
+            "value": "Bearer {{refreshToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/refreshToken",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "refreshToken"
+          ]
+        }
+      }
+    },
+    {
+      "name": "logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "9ea1e2f2-cf86-4e3e-a2b2-2233a723283e",
+            "exec": [
+              "const json = pm.response.json();\r",
+              "if (json && json.token) pm.environment.set(\"token\",json.token);\r",
+              "if (json && json.refreshToken) pm.environment.set(\"refreshToken\",json.refreshToken);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "347cbfb5-d451-486f-a5a9-eddc3da84ec4",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "c0431f6e-2392-4f3c-871f-a367d82b8404",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{refreshToken}}",
+            "type": "text"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"userName\": \"admin\",\r\n    \"pw\": \"test\"\r\n}",
+          "raw": "",
           "options": {
             "raw": {
               "language": "json"
@@ -295,14 +343,14 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3000/login",
+          "raw": "http://localhost:3000/logout",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "3000",
           "path": [
-            "login"
+            "logout"
           ]
         }
       }

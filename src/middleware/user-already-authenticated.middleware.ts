@@ -18,7 +18,7 @@ export function UserAlreadyAuthenticated(req: Request, res: Response, next: Next
     const auth = req.headers['authorization'];
     const token = auth?.startsWith('Bearer ') && auth.split(' ')[1];
     if (!token || !token.trim().length) return login(req, res, next);
-    const user = jwt.verify(token, EnvVars.jwtAccessToken)
+    const user = jwt.verify(token, EnvVars.jwtAccessToken);
     if (user) return res.status(200).json({ message: 'User already authenticated' });
     login(req, res, next);
   } catch {
