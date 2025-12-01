@@ -11,19 +11,24 @@ import { EnvVars } from '../../src/core/env-vars.core.js';
 
 describe('routes', () => {
   let findOneStub: sinon.SinonStub;
+  let findStub: sinon.SinonStub;
   let updateOneStub: sinon.SinonStub;
   let insertOneStub: sinon.SinonStub;
+  let deleteOneStub: sinon.SinonStub;
   const validRefreshToken = jwt.sign({ userName: 'test', sub: '123' }, EnvVars.jwtRefreshToken);
-  const invalidRefreshToken = 'invalid-token';
 
   beforeEach(() => {
     findOneStub = sinon.stub();
+    findStub = sinon.stub();
     insertOneStub = sinon.stub();
     updateOneStub = sinon.stub();
+    deleteOneStub = sinon.stub();
     sinon.stub(db, 'getCollection').returns({
       findOne: findOneStub,
+      find: findStub,
       insertOne: insertOneStub,
       updateOne: updateOneStub,
+      deleteOne: deleteOneStub
     } as unknown as Collection);
   });
 
@@ -127,7 +132,7 @@ describe('routes', () => {
     assert.equal('object', typeof insertOneStub.getCall(0).args[0]);
   });
 
-  it('createTask, retuns error when data is wrong', async () => {
+  it('createTask, returns status code 400 and 500', async () => {
     sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
     let response = await request(app)
       .post('/createTask')
@@ -150,5 +155,56 @@ describe('routes', () => {
       .send({ name: 'name', description: 'description' });
 
     assert.strictEqual(response.status, 500);
+  });
+
+  it('getTasks, returns status code 200', async () => {
+    sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
+    findStub.returns({ toArray: () => Promise.resolve([]) });
+    const response = await request(app)
+      .get('/getTasks')
+      .set('Authorization', `Bearer ${validRefreshToken}`);
+
+    assert.strictEqual(response.status, 200);
+  });
+
+  it('getTasks, returns status code 500', async () => {
+    sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
+    findStub.throws('error');
+    const response = await request(app)
+      .get('/getTasks')
+      .set('Authorization', `Bearer ${validRefreshToken}`);
+
+    assert.strictEqual(response.status, 500);
+  });
+
+  it('deleteTask, returns status code 200', async () => {
+    sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
+    findOneStub.returns(Promise.resolve({}));
+    deleteOneStub.returns(void 0);
+    const response = await request(app)
+      .delete('/deleteTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ taskId: '507f1f77bcf86cd799439055' });
+
+    assert.strictEqual(response.status, 200);
+  });
+
+  it('deleteTask, returns status code 500 and 400', async () => {
+    sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
+    findOneStub.returns(Promise.resolve({}));
+    deleteOneStub.throws('error');
+    let response = await request(app)
+      .delete('/deleteTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ taskId: '507f1f77bcf86cd799439055' });
+
+    assert.strictEqual(response.status, 500);
+
+    response = await request(app)
+      .delete('/deleteTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ taskId: '' });
+
+    assert.strictEqual(response.status, 400);
   });
 });
