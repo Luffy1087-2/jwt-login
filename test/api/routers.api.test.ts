@@ -113,4 +113,42 @@ describe('routes', () => {
 
     assert.strictEqual(response.status, 201);
   });
+
+  it('createTask, task is added, status 201', async () => {
+    insertOneStub.returns(Promise.resolve({ acknowledged: true }));
+    sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
+    const response = await request(app)
+      .post('/createTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ name: 'name', description: 'description' });
+
+    assert.strictEqual(response.status, 201);
+    assert.ok(!!insertOneStub.getCall(0));
+    assert.equal('object', typeof insertOneStub.getCall(0).args[0]);
+  });
+
+  it('createTask, retuns error when data is wrong', async () => {
+    sinon.stub(jwt, 'verify').returns({ sub: '507f1f77bcf86cd799439011' } as any);
+    let response = await request(app)
+      .post('/createTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ name: '', description: 'description' });
+
+    assert.strictEqual(response.status, 400);
+
+    response = await request(app)
+      .post('/createTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ name: 'name', description: '' });
+
+    assert.strictEqual(response.status, 400);
+
+    insertOneStub.throwsException('error');
+    response = await request(app)
+      .post('/createTask')
+      .set('Authorization', `Bearer ${validRefreshToken}`)
+      .send({ name: 'name', description: 'description' });
+
+    assert.strictEqual(response.status, 500);
+  });
 });
